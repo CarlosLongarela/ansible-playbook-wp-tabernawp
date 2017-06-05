@@ -110,13 +110,14 @@
       changed_when: salida.stdout != ""
 
   roles:
-    - role: apt
-    - role: ntp
-    - role: mariadb
-    - role: php7
-    - role: certbot
-    - role: nginx
-    - role: wordpress
+    - apt         # En Ansible Galaxy: CarlosLongarela.apt
+    - ntp         # En Ansible Galaxy: CarlosLongarela.ntp
+    - mariadb     # En Ansible Galaxy: CarlosLongarela.mariadb
+    - php7        # En Ansible Galaxy: CarlosLongarela.php7
+    - certbot     # En Ansible Galaxy: CarlosLongarela.certbot
+    - nginx       # En Ansible Galaxy: CarlosLongarela.nginx
+#    - phpmyadmin  # En Ansible Galaxy: CarlosLongarela.phpmyadmin
+    - wordpress   # En Ansible Galaxy: CarlosLongarela.wordpress
 
   post_tasks:
     - name: "Actualizamos paquetes del sistema"
@@ -130,5 +131,4 @@
 #      args:
 #        creates: "/etc/letsencrypt/live/{{ nginx_vhosts.tabernawp.dominio }}/fullchain.pem"
 #certbot certonly --webroot -w /home/webs/tabernawp.com/public -d www.tabernawp.com -d tabernawp.com -m carlos@longarela.eu --dry-run
-
 
