@@ -1,0 +1,134 @@
+---
+# Ejecutar con: $ ansible-playbook -i tabernawp tabernawp.yml
+- hosts: tabernawp
+
+  gather_facts: no
+  become: true
+
+  vars:
+    aptget_update_cache_valid_time: 3600
+
+    aptget_install:
+      - aptitude
+      - mc
+      - nano
+      - sysv-rc-conf
+      - python-pip
+      - python-dev
+      - libmysqlclient-dev
+      - lynx
+      - curl
+
+    mariadb_path_backups: "{{ vault_mariadb_path_backups }}"
+    mariadb_databases:
+      - "{{ vault_mariadb_databases_db1 }}"
+
+    mariadb_users:
+      user1:
+        name: "{{ vault_mariadb_users_1_name }}"
+        password: "{{ vault_mariadb_users_1_password }}"
+        priv: "{{ vault_mariadb_users_1_priv }}"
+
+    mariadb_root_password: "{{ vault_mariadb_root_password }}"
+
+    mariadb_utiles_bd: true
+    mariadb_cron_backup: false
+
+    mariadb_options:
+      bind_address: "{{ vault_mariadb_options_bind_address }}"
+      performance_schema: on
+      skip_name_resolve: 1
+      max_connections: 100
+      connect_timeout: 2
+      max_allowed_packet: 10M
+      innodb_buffer_pool_instances: 1
+      innodb_buffer_pool_size: 100M
+      innodb_log_file_size: 25M
+      table_cache: 1000
+      tmp_table_size: 50M
+      max_heap_table_size: 50M
+      query_cache_type: 1
+      query_cache_limit: 1M
+      query_cache_size: 20M
+      query_cache_min_res_unit: 2k
+      join_buffer_size: 2M
+      sort_buffer_size: 256K
+      read_buffer_size: 128K
+      read_rnd_buffer_size: 4M
+      key_buffer: 250M
+      slow_query_log: true
+      long_query_time: 3
+      log_slow_admin_statements: true
+      log_queries_not_using_indexes: true
+
+    nginx_vhosts_root: "{{ vault_nginx_vhosts_root }}"
+
+    nginx_vhosts:
+      tabernawp:
+        default_server: true # Sólo debe existir uno como default server
+        activado: true
+        archivo_conf: "tabernawp.com.conf"
+        dominio: "tabernawp.com"
+        dominio_dir_certbot: "www.tabernawp.com"
+        sin_www:  true
+        ssl: true
+        cache_nginx: true
+        fcgi_cache_path: "/var/run/nginx-cache"
+        fcgi_levels: "1:2"
+        fcgi_keys_zone_name: "WEBWP"
+        fcgi_keys_zone_size: "100m"
+        fcgi_inactive: "9h"
+        fcgi_cache_valid: "6h"
+        cms: "wordpress"
+        root: "{{ vault_website1_root }}"
+        index: "index.html index.htm index.php"
+
+    nginx_vhosts_activados:
+      - tabernawp.com.conf
+
+    wp_cli_wp_locale: "es_ES"
+    wp_cli_wp_path: "{{ vault_website1_root }}"
+
+    wp_cli_wp_db: "{{ vault_mariadb_databases_db1 }}"
+    wp_cli_wp_db_user: "{{ vault_mariadb_users_1_name }}"
+    wp_cli_wp_db_pass: "{{ vault_mariadb_users_1_password }}"
+    wp_cli_wp_db_host: "{{ vault_wp_cli_wp_db_host }}"
+    wp_cli_wp_dp_prefix: "{{ vault_wp_cli_wp_dp_prefix }}"
+
+    wp_cli_wp_url: "https://{{ nginx_vhosts.tabernawp.dominio}}"
+    wp_cli_wp_title: "Taberna WordPress"
+    wp_cli_wp_admin_user: "{{ vault_wp_cli_wp_admin_user }}"
+    wp_cli_wp_admin_password: "{{ vault_wp_cli_wp_admin_password }}"
+    wp_cli_wp_admin_email: "{{ vault_certbot_mail }}"
+
+    update_packages: true
+
+  pre_tasks:
+    - name: 'Instalar python2'
+      raw: test -e /usr/bin/python || (apt -y update && apt install -y python-minimal)
+      register: salida
+      changed_when: salida.stdout != ""
+
+  roles:
+    - role: apt
+    - role: ntp
+    - role: mariadb
+    - role: php7
+    - role: certbot
+    - role: nginx
+    - role: wordpress
+
+  post_tasks:
+    - name: "Actualizamos paquetes del sistema"
+      apt:
+        upgrade: yes
+      when: update_packages
+
+    # Realizamos manualmente la solicitud del certificado ya que nos realiza algunas preguntas
+#    - name: "Solicitamos el certificado para el sitio web de Lets Encrypt"
+#      command: "certbot certonly --webroot -w www.{{ nginx_vhosts.tabernawp.dominio }} -d {{ nginx_vhosts.tabernawp.root }} -d {{ nginx_vhosts.tabernawp.dominio }} -m {{ vault_certbot_mail }}"
+#      args:
+#        creates: "/etc/letsencrypt/live/{{ nginx_vhosts.tabernawp.dominio }}/fullchain.pem"
+#certbot certonly --webroot -w /home/webs/tabernawp.com/public -d www.tabernawp.com -d tabernawp.com -m carlos@longarela.eu --dry-run
+
+
