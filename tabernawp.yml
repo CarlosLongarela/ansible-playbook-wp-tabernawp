@@ -1,4 +1,6 @@
 ---
+# La primera vez conectarse por SSH para aceptar el certificado (host's fingerprint) con:
+# ssh root@178.33.101.145 -p 6105
 # Ejecutar con: $ ansible-playbook -i tabernawp tabernawp.yml
 - hosts: tabernawp
 
@@ -73,6 +75,7 @@
         sin_www:  true
         ssl: true
         cache_nginx: true
+        wpo_nginx: true
         fcgi_cache_path: "/var/run/nginx-cache"
         fcgi_levels: "1:2"
         fcgi_keys_zone_name: "WEBWP"

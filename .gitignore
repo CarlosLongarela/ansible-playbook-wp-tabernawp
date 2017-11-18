@@ -40,3 +40,4 @@ ansible.log
 /.vault_pass
 /ansible.log
 /retry-files
+/settings.json
