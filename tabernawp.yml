@@ -88,6 +88,7 @@
 
     nginx_vhosts_activados:
       - tabernawp.com.conf
+      - contabilidad.longarela.eu.conf
 
     wp_cli_wp_locale: "es_ES"
     wp_cli_wp_path: "{{ vault_website1_root }}"
