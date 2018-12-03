@@ -34,7 +34,8 @@
     mariadb_root_password: "{{ vault_mariadb_root_password }}"
 
     mariadb_utiles_bd: true
-    mariadb_cron_backup: false
+    mariadb_cron_backup: true
+    mariadb_cron_optimizacion: true
 
     mariadb_options:
       bind_address: "{{ vault_mariadb_options_bind_address }}"
@@ -71,7 +72,7 @@
         activado: true
         archivo_conf: "tabernawp.com.conf"
         dominio: "tabernawp.com"
-        dominio_dir_certbot: "www.tabernawp.com"
+        dominio_dir_certbot: "tabernawp.com"
         sin_www:  true
         ssl: true
         cache_nginx: true
@@ -134,5 +135,5 @@
 #      command: "certbot certonly --webroot -w www.{{ nginx_vhosts.tabernawp.dominio }} -d {{ nginx_vhosts.tabernawp.root }} -d {{ nginx_vhosts.tabernawp.dominio }} -m {{ vault_certbot_mail }}"
 #      args:
 #        creates: "/etc/letsencrypt/live/{{ nginx_vhosts.tabernawp.dominio }}/fullchain.pem"
-#certbot certonly --webroot -w /home/webs/tabernawp.com/public -d www.tabernawp.com -d tabernawp.com -m carlos@longarela.eu --dry-run
+#certbot certonly --webroot -w /home/webs/tabernawp.com/public -d tabernawp.com -d tabernawp.com -m carlos@longarela.eu --dry-run
 
